@@ -218,6 +218,7 @@ class Tick(martist.Artist):
         self._pad = self._base_pad + self.get_tick_padding()
 
     def get_tickdir(self):
+        """Get tick direction ('out', 'in' or 'inout')."""
         return self._tickdir
 
     def get_tick_padding(self):
@@ -252,7 +253,7 @@ class Tick(martist.Artist):
 
     def set_pad(self, val):
         """
-        Set the tick label pad in points
+        Set the tick label pad in points.
 
         Parameters
         ----------
@@ -620,6 +621,7 @@ class Axis(martist.Artist):
     minorTicks : list of `.Tick`
         The minor ticks.
     """
+    #: The border between the tick labels and the offset text, measured in points.
     OFFSETTEXTPAD = 3
     # The class used in _get_tick() to create tick instances. Must either be
     # overwritten in subclasses, or subclasses must reimplement _get_tick().
@@ -642,6 +644,7 @@ class Axis(martist.Artist):
             Whether to clear the Axis on creation. This is not required, e.g.,  when
             creating an Axis as part of an Axes, as ``Axes.clear`` will call
             ``Axis.clear``.
+
             .. versionadded:: 3.8
         """
         super().__init__()
@@ -831,6 +834,10 @@ class Axis(martist.Artist):
                 **{f"scale{k}": k == name for k in self.axes._axis_names})
 
     def limit_range_for_scale(self, vmin, vmax):
+        """
+        Return the range *vmin*, *vmax*, restricted to the domain supported by
+        the scale of this axis.
+        """
         return self._scale.limit_range_for_scale(vmin, vmax, self.get_minpos())
 
     def _get_autoscale_on(self):
@@ -1365,6 +1372,7 @@ class Axis(martist.Artist):
             return None
 
     def get_tick_padding(self):
+        """Get the maximum length of this Axis' ticks outside of the Axes."""
         values = []
         if len(self.majorTicks):
             values.append(self.majorTicks[0].get_tick_padding())
@@ -1416,7 +1424,7 @@ class Axis(martist.Artist):
         return self._pickradius
 
     def get_majorticklabels(self):
-        """Return this Axis' major tick labels, as a list of `~.text.Text`."""
+        """Return this Axis' major tick labels, as a list of `~.text.Text`\s."""
         self._update_ticks()
         ticks = self.get_major_ticks()
         labels1 = [tick.label1 for tick in ticks if tick.label1.get_visible()]
@@ -1424,7 +1432,7 @@ class Axis(martist.Artist):
         return labels1 + labels2
 
     def get_minorticklabels(self):
-        """Return this Axis' minor tick labels, as a list of `~.text.Text`."""
+        """Return this Axis' minor tick labels, as a list of `~.text.Text`\s."""
         self._update_ticks()
         ticks = self.get_minor_ticks()
         labels1 = [tick.label1 for tick in ticks if tick.label1.get_visible()]
@@ -1447,7 +1455,7 @@ class Axis(martist.Artist):
 
         Returns
         -------
-        list of `~matplotlib.text.Text`
+        list of `~matplotlib.text.Text`\s
         """
         if which is not None:
             if which == 'minor':
@@ -1752,6 +1760,16 @@ class Axis(martist.Artist):
         return self.converter is not None or self.units is not None
 
     def convert_units(self, x):
+        """
+        Convert *x* using the unit type of the axis.
+
+        If the axis does not have units, *x* itself is returned.
+
+        Parameters
+        ----------
+        x : value(s) to convert
+
+        """
         # If x is natively supported by Matplotlib, doesn't need converting
         if munits._is_natively_supported(x):
             return x
@@ -2239,7 +2257,7 @@ class Axis(martist.Artist):
 
     def set_label_position(self, position):
         """
-        Set the label position (top or bottom)
+        Set the label position ("top" or "bottom")
 
         Parameters
         ----------
@@ -2248,6 +2266,7 @@ class Axis(martist.Artist):
         raise NotImplementedError()
 
     def get_minpos(self):
+        """Return the minimum positive data value in the direction of this axis."""
         raise NotImplementedError()
 
 
@@ -2491,6 +2510,7 @@ class XAxis(Axis):
         "data", "dataLim", "intervalx")
 
     def get_minpos(self):
+        # docstring inherited.
         return self.axes.dataLim.minposx
 
     def set_default_intervals(self):
@@ -2578,7 +2598,7 @@ class YAxis(Axis):
 
     def set_label_position(self, position):
         """
-        Set the label position (left or right)
+        Set the label position ("left" or "right")
 
         Parameters
         ----------
@@ -2648,6 +2668,8 @@ class YAxis(Axis):
 
     def set_offset_position(self, position):
         """
+        Set the x position of the offset text in axes coordinates.
+
         Parameters
         ----------
         position : {'left', 'right'}
@@ -2734,6 +2756,7 @@ class YAxis(Axis):
         "data", "dataLim", "intervaly")
 
     def get_minpos(self):
+        # docstring inherited.
         return self.axes.dataLim.minposy
 
     def set_default_intervals(self):
